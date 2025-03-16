@@ -17,22 +17,8 @@
  * '01 Jan 1970 00:00:00 UTC' => 0
  * '04 Dec 1995 00:12:00 UTC' => 818035920000
  */
-function dateToTimestamp(/* date */) {
-  throw new Error('Not implemented');
-}
-
-/**
- * Returns the time in hh:mm:ss format from the received date.
- *
- * @param {Date} date - date.
- * @return {string} time in hh:mm:ss format.
- *
- * @example:
- * Date(2023, 5, 1, 8, 20, 55) => '08:20:55'
- * Date(2015, 10, 20, 23, 15, 1) => '23:15:01'
- */
-function getTime(/* date */) {
-  throw new Error('Not implemented');
+function dateToTimestamp(date) {
+  return Date.parse(date);
 }
 
 /**
@@ -46,8 +32,19 @@ function getTime(/* date */) {
  * '03 Dec 1995 00:12:00 UTC' => 'Sunday'
  * '2024-01-30T00:00:00.000Z' => 'Tuesday'
  */
-function getDayName(/* date */) {
-  throw new Error('Not implemented');
+function getDayName(date) {
+  const daysOfWeek = [
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+  ];
+  const dateObj = new Date(date);
+  const dayIndex = dateObj.getUTCDay();
+  return daysOfWeek[dayIndex];
 }
 
 /**
@@ -76,8 +73,16 @@ function getNextFriday(/* date */) {
  * 1, 2024 => 31
  * 2, 2024 => 29
  */
-function getCountDaysInMonth(/* month, year */) {
-  throw new Error('Not implemented');
+function getCountDaysInMonth(month, year) {
+  let countDays;
+  if (month === 2) {
+    countDays = year % 4 === 0 ? 29 : 28;
+  } else if (month <= 7) {
+    countDays = month % 2 === 0 ? 30 : 31;
+  } else {
+    countDays = month % 2 === 0 ? 31 : 30;
+  }
+  return countDays;
 }
 
 /**
@@ -127,8 +132,18 @@ function isDateInPeriod(/* date, period */) {
  * '1999-01-05T02:20:00.000Z' => '1/5/1999, 2:20:00 AM'
  * '2010-12-15T22:59:00.000Z' => '12/15/2010, 10:59:00 PM'
  */
-function formatDate(/* date */) {
-  throw new Error('Not implemented');
+function formatDate(date) {
+  const newDate = new Date(date);
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    hour12: true,
+    timeZone: 'UTC',
+  }).format(newDate);
 }
 
 /**
@@ -143,8 +158,16 @@ function formatDate(/* date */) {
  * 12, 2023 => 10
  * 1, 2024 => 8
  */
-function getCountWeekendsInMonth(/* month, year */) {
-  throw new Error('Not implemented');
+function getCountWeekendsInMonth(month, year) {
+  let countWeekends = 0;
+  const daysInMonth = getCountDaysInMonth(month, year);
+  for (let i = 1; i <= daysInMonth; i += 1) {
+    const date = new Date(year, month - 1, i);
+    if (date.getDay() === 0 || date.getDay() === 6) {
+      countWeekends += 1;
+    }
+  }
+  return countWeekends;
 }
 
 /**
@@ -234,7 +257,6 @@ function isLeapYear(/* date */) {
 
 module.exports = {
   dateToTimestamp,
-  getTime,
   getDayName,
   getNextFriday,
   getCountDaysInMonth,
