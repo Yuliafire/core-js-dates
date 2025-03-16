@@ -32,8 +32,12 @@ function dateToTimestamp(date) {
  * Date(2015, 10, 20, 23, 15, 1) => '23:15:01'
  */
 
+// function getTime(date) {
+//   return date.timeToString().split(' ').shift();
+// }
+
 function getTime(date) {
-  return date.timeToString().split(' ').shift();
+  return new Intl.DateTimeFormat('en-GB', { timeStyle: 'medium' }).format(date);
 }
 
 /**
@@ -278,9 +282,49 @@ function getQuarter(date) {
  * { start: '01-01-2024', end: '15-01-2024' }, 1, 3 => ['01-01-2024', '05-01-2024', '09-01-2024', '13-01-2024']
  * { start: '01-01-2024', end: '10-01-2024' }, 1, 1 => ['01-01-2024', '03-01-2024', '05-01-2024', '07-01-2024', '09-01-2024']
  */
-function getWorkSchedule(/* period, countWorkDays, countOffDays */) {
-  throw new Error('Not implemented');
-}
+
+// Helper functions moved to global scope to avoid shadowing
+
+function getWorkSchedule(period, countWorkDays, countOffDays) {
+  // Start the function to create a work schedule
+  const workSchedule = []; // Create an empty array to store workdays (e.g., ['01-01-2024'])
+
+  // Helper function to convert 'DD-MM-YYYY' string to Date object
+  function formatDateStr(dateStr) {
+    // Turn a date string into a Date object
+    const dateParts = dateStr.split('-'); // Split '01-01-2024' into ['01', '01', '2024']
+    return new Date(dateParts[2], dateParts[1] - 1, dateParts[0]); // Create Date: year, month-1 (0-based), day
+  }
+
+  const startDate = formatDateStr(period.start); // Convert start date (e.g., '01-01-2024') to Date object
+  const endDate = formatDateStr(period.end); // Convert end date (e.g., '15-01-2024') to Date object
+  let currentDate = new Date(startDate); // Set currentDate to startDate (e.g., Jan 1, 2024)
+  const MS_PER_DAY = 86_400_000; // Define milliseconds in a day (1000 * 60 * 60 * 24)
+
+  while (currentDate <= endDate) {
+    // Loop while currentDate is on or before endDate
+    workSchedule.push(
+      // Add current date to work schedule
+      `${currentDate.getDate().toString().padStart(2, '0')}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${currentDate.getFullYear()}`
+    ); // Format as 'DD-MM-YYYY' (e.g., '01-01-2024')
+
+    for (let i = 0; i < countWorkDays - 1; i += 1) {
+      // Loop for remaining workdays
+      if (currentDate >= endDate) break; // Stop if past end date
+      currentDate = new Date(currentDate.getTime() + MS_PER_DAY); // Move to next day
+      workSchedule.push(
+        // Add next workday to schedule
+        `${currentDate.getDate().toString().padStart(2, '0')}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${currentDate.getFullYear()}`
+      ); // Format as 'DD-MM-YYYY'
+    }
+
+    currentDate = new Date(
+      currentDate.getTime() + MS_PER_DAY * (countOffDays + 1)
+    ); // Skip off days and move to next cycle
+  }
+
+  return workSchedule; // Return the array of workdays
+} // End the function
 
 /**
  * Determines whether the year in the provided date is a leap year.
