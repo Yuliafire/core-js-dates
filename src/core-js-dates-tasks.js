@@ -22,6 +22,20 @@ function dateToTimestamp(date) {
 }
 
 /**
+ * Returns the time in hh:mm:ss format from the received date.
+ *
+ * @param {Date} date - date.
+ * @return {string} time in hh:mm:ss format.
+ *
+ * @example:
+ * Date(2023, 5, 1, 8, 20, 55) => '08:20:55'
+ * Date(2015, 10, 20, 23, 15, 1) => '23:15:01'
+ */
+function getTime(date) {
+  return date.toTimeString().split(' ').shift();
+}
+
+/**
  * Returns the name of the day of the week for a given date string.
  *
  * @param {string} date - date and time.
@@ -58,8 +72,14 @@ function getDayName(date) {
  * Date('2024-02-13T00:00:00Z') => Date('2024-02-16T00:00:00Z')
  * Date('2024-02-16T00:00:00Z') => Date('2024-02-23T00:00:00Z')
  */
-function getNextFriday(/* date */) {
-  throw new Error('Not implemented');
+function getNextFriday(date) {
+  const givenDay = date.getDay();
+  const tillFriday = givenDay === 5 ? 7 : (5 - givenDay + 7) % 7;
+
+  const nextFriday = new Date(date);
+  nextFriday.setDate(date.getDate() + tillFriday);
+
+  return nextFriday;
 }
 
 /**
@@ -96,8 +116,13 @@ function getCountDaysInMonth(month, year) {
  * '2024-02-01T00:00:00.000Z', '2024-02-02T00:00:00.000Z'  => 2
  * '2024-02-01T00:00:00.000Z', '2024-02-12T00:00:00.000Z'  => 12
  */
-function getCountDaysOnPeriod(/* dateStart, dateEnd */) {
-  throw new Error('Not implemented');
+function getCountDaysOnPeriod(dateStart, dateEnd) {
+  const MSEC_PER_DAY = 86_400_000;
+
+  const start = Date.parse(dateStart);
+  const end = Date.parse(dateEnd);
+
+  return (end - start) / MSEC_PER_DAY + 1;
 }
 
 /**
@@ -257,6 +282,7 @@ function isLeapYear(/* date */) {
 
 module.exports = {
   dateToTimestamp,
+  getTime,
   getDayName,
   getNextFriday,
   getCountDaysInMonth,
