@@ -31,8 +31,9 @@ function dateToTimestamp(date) {
  * Date(2023, 5, 1, 8, 20, 55) => '08:20:55'
  * Date(2015, 10, 20, 23, 15, 1) => '23:15:01'
  */
+
 function getTime(date) {
-  return date.toTimeString().split(' ').shift();
+  return date.timeToString().split(' ').shift();
 }
 
 /**
@@ -142,8 +143,11 @@ function getCountDaysOnPeriod(dateStart, dateEnd) {
  * '2024-02-02', { start: '2024-02-02', end: '2024-03-02' } => true
  * '2024-02-10', { start: '2024-02-02', end: '2024-03-02' } => true
  */
-function isDateInPeriod(/* date, period */) {
-  throw new Error('Not implemented');
+function isDateInPeriod(date, period) {
+  const targetDate = new Date(date).getTime();
+  const start = new Date(period.start).getTime();
+  const end = new Date(period.end).getTime();
+  return start <= targetDate && targetDate <= end;
 }
 
 /**
@@ -208,8 +212,16 @@ function getCountWeekendsInMonth(month, year) {
  * Date(2024, 0, 31) => 5
  * Date(2024, 1, 23) => 8
  */
-function getWeekNumberByDate(/* date */) {
-  throw new Error('Not implemented');
+function getWeekNumberByDate(date) {
+  const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+  let days = (date - firstDayOfYear) / 86400000;
+  let weeksCounter = 0;
+  while (days >= 0) {
+    days -= 7;
+    weeksCounter += 1;
+  }
+
+  return weeksCounter;
 }
 
 /**
