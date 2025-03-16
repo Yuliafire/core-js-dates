@@ -256,8 +256,8 @@ function getNextFridayThe13th(date) {
  * Date(2024, 5, 1) => 2
  * Date(2024, 10, 10) => 4
  */
-function getQuarter(/* date */) {
-  throw new Error('Not implemented');
+function getQuarter(date) {
+  return Math.ceil((date.getMonth() + 1) / 3);
 }
 
 /**
@@ -294,8 +294,18 @@ function getWorkSchedule(/* period, countWorkDays, countOffDays */) {
  * Date(2022, 2, 1) => false
  * Date(2020, 2, 1) => true
  */
-function isLeapYear(/* date */) {
-  throw new Error('Not implemented');
+
+// Leap Year Rules (Super Easy)
+
+//     Rule 1: A year divisible by 400 is a leap year (e.g., 2000).
+//     Rule 2: A year divisible by 100 is NOT a leap year (e.g., 1900), unless it also meets Rule 1.
+//     Rule 3: A year divisible by 4 is a leap year (e.g., 2024), unless it’s divisible by 100 (and not 400).
+function isLeapYear(date) {
+  const year = date.getFullYear();
+  const isDivisible400 = year % 400 === 0;
+  const isDivisible100 = year % 100 === 0;
+  const isDivisible4 = year % 4 === 0;
+  return isDivisible400 || (isDivisible4 && !isDivisible100);
 }
 
 module.exports = {
